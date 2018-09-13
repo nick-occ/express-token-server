@@ -5,7 +5,9 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
-const config = require('../config/config.json');
+const {mongoose} = require('./db/mongoose');
+
+var {Config} = require('./models/config');
 
 const app = express();
 
@@ -20,17 +22,25 @@ app.post('/token', (req, res) => {
     params.append('client', 'referer');
     params.append('referer','localhost:3001');
     params.append('expiration', '60');
-    params.append('username', jwt.verify(body.username, config.token_secret));
-    params.append('password', jwt.verify(body.password, config.token_secret));
+    params.append('username', jwt.verify(body.username, process.env.ARCGIS_SECRET));
+    params.append('password', jwt.verify(body.password, process.env.ARCGIS_SECRET));
 
-    axios.post(config.token_url, params)
+    axios.post(process.env.ARCGIS_TOKEN_URL, params)
     .then((response) => {
-        jwt.sign(response.data.token, config.token_secret, (err, signedToken) => {
+        jwt.sign(response.data.token, process.env.ARCGIS_SECRET, (err, signedToken) => {
             res.set('x-esri-token', signedToken).send({token: signedToken});
         });
     }).catch((err) => {
         res.status(400).send(err);
     });
-})
+});
+
+app.get('/config', (req, res) => {
+    Config.findOne({}).then((config)  => {
+        res.send({config})
+    }).catch((e) => {
+        res.status(400).send(e);
+    });
+});
 
 app.listen(3000, () => console.log('Listening on port 3000'));
