@@ -5,8 +5,7 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
-const {mongoose} = require('./db/mongoose');
-
+const mongoose = require('./db/mongoose');
 var {Config} = require('./models/config');
 
 const app = express();
@@ -38,6 +37,29 @@ app.post('/token', (req, res) => {
 app.get('/config', (req, res) => {
     Config.findOne({}).then((config)  => {
         res.send({config})
+    }).catch((e) => {
+        res.status(400).send(e);
+    });
+});
+
+app.post('/search', (req, res) => {
+    let body = _.pick(req.body, ["term","latitude","longitude"]);
+    console.log(body);
+    let params = new URLSearchParams();
+    params.append('term', body.term);
+    params.append('latitude', body.latitude);
+    params.append('longitude', body.longitude);
+
+    let headers = {
+        Authorization: `Bearer ${process.env.YELP_API}`
+    }
+
+    axios.get(process.env.YELP_URL,{
+        params,
+        headers
+    }).then((response) => {
+        let businessData = response.data;
+        res.send(businessData);
     }).catch((e) => {
         res.status(400).send(e);
     });
