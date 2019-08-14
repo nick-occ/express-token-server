@@ -6,7 +6,7 @@ const axios = require('axios');
 const jwt = require('jsonwebtoken');
 
 const mongoose = require('./db/mongoose');
-var {Config} = require('./models/config');
+const {Config} = require('./models/config');
 
 const app = express();
 
@@ -52,7 +52,7 @@ app.post('/search', (req, res) => {
 
     let headers = {
         Authorization: `Bearer ${process.env.YELP_API}`
-    }
+    };
 
     axios.get(process.env.YELP_URL,{
         params,

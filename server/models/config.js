@@ -1,13 +1,14 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var ConfigSchema = new mongoose.Schema({
+const ConfigSchema = new mongoose.Schema({
     name: 'string',
+    mapUrl: 'string',
     mapService: 'string',
     basemap:  'string',
     center:  'array',
     zoom:  'number'
-})
+});
 
-var Config = mongoose.model('Config', ConfigSchema);
+const Config = mongoose.model('projects', ConfigSchema);
 
 module.exports = {Config};
